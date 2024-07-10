@@ -1,4 +1,94 @@
 const express=require("express");
 const router=express.Router();
-const todo=require("../models/todo");
+const Todo=require("../models/todo");
 
+router.get("/", async (req,res)=>{
+    try{
+        const myTodo= await Todo.find();
+        res.json(myTodo);
+    }catch(err){
+        res.status(500).json({message:err.message});
+    }
+});
+
+router.get("/myorxan/:id", async (req,res)=>{
+    try{
+        const newTodo= await Todo.findById(req.params.id);
+        res.json(newTodo);
+    }catch(err){
+        res.status(500).json({message:err.message});
+    }
+});
+
+
+router.post("/create", async (req,res)=>{
+    try{
+
+        const {Titel,Content,Completed}=req.body;
+        const todo= new Todo({Titel,Content,Completed});
+        const newTodo = await todo.save();
+        res.json(newTodo);
+
+    }catch(err){
+        res.status(400).json({message:err.message});
+    }
+});
+
+
+router.put("/myput/:id",async (req,res)=>{
+
+
+    try {
+        const upTodo= await Todo.findByIdAndUpdate(req.params.id,{
+            Titel:req.body.Title,
+            Content:req.body.Content,
+            Completed:req.body.Completed,
+        },{new:true,runValidators:true});
+
+        if(!upTodo)
+            return res.status(404).json({message: "Todo Not Found"})
+        
+        res.status(200).json(upTodo);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
+router.delete("/mydelete/:id", async (req,res)=>{
+    try {
+        const todo = Todo.findByIdAndDelete(req.params.id);
+
+        if (index === -1) {
+            return res.status(404).json({ message: 'Data tapilmadi' });
+        }
+
+        res.json(todo);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
+router.get("/download", async (req, res) => {
+    try {
+        const todosText = Todo.map(todo => `ID: ${todo.id}\nTitle: ${todo.title}\nContent: ${todo.content}\nCompleted: ${Completed}\n`).join('\n');
+        const filePath = 'todoArray.txt';
+        fs.writeFileSync(filePath, todosText);
+
+        res.download(filePath, (err) => {
+            if (err) {
+                res.status(500).send('Error downloading file');
+            } else {
+                console.log('File downloaded successfully');
+                fs.unlinkSync(filePath);
+            }
+        });
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).send('Error creating and downloading file');
+    }
+});
+
+
+module.exports=router;
