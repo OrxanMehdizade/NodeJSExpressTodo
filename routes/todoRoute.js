@@ -1,6 +1,8 @@
 const express=require("express");
 const router=express.Router();
 const Todo=require("../models/todo");
+const path = require("path");
+const fs = require("fs");
 
 router.get("/", async (req,res)=>{
     try{
@@ -11,7 +13,7 @@ router.get("/", async (req,res)=>{
     }
 });
 
-router.get("/myorxan/:id", async (req,res)=>{
+router.get("/myTodo/:id", async (req,res)=>{
     try{
         const newTodo= await Todo.findById(req.params.id);
         res.json(newTodo);
@@ -89,6 +91,4 @@ router.get("/download", async (req, res) => {
         res.status(500).send('Error creating and downloading file');
     }
 });
-
-
 module.exports=router;
