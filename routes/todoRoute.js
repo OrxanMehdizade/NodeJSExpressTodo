@@ -46,7 +46,7 @@ router.put("/myput/:id",async (req,res)=>{
             Content:req.body.Content,
             Completed:req.body.Completed,
         },{new:true,runValidators:true});
-
+        
         if(!upTodo)
             return res.status(404).json({message: "Todo Not Found"})
         
@@ -91,4 +91,26 @@ router.get("/download", async (req, res) => {
         res.status(500).send('Error creating and downloading file');
     }
 });
+
+router.get("/search/:searchThem",async (req,res)=>{
+    try{
+        const searchValue=req.params.searchThem;
+        const results = await Todo.find(
+            {
+                $or:[
+                    {Title:{$regex:searchValue, $options:"i"}},
+                    
+                    {Content:{$regex:searchValue, $options:"i"}},
+                    
+                    {Completed:{$regex:searchValue, $options:"i"}},
+                ]
+    
+            }
+        );
+        res.json(results);
+    }catch(err){
+        res.status(400).json({message:err.message});
+    }
+});
+
 module.exports=router;
