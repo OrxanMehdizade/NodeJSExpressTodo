@@ -3,8 +3,9 @@ const router=express.Router();
 const Todo=require("../models/todo");
 const path = require("path");
 const fs = require("fs");
+const {authenticateAccessToken}=require("../middleware/authenticateAccessToken");
 
-router.get("/", async (req,res)=>{
+router.get("/",authenticateAccessToken, async (req,res)=>{
     try{
         const myTodo= await Todo.find();
         res.json(myTodo);
@@ -13,7 +14,7 @@ router.get("/", async (req,res)=>{
     }
 });
 
-router.get("/myTodo/:id", async (req,res)=>{
+router.get("/myTodo/:id",authenticateAccessToken, async (req,res)=>{
     try{
         const newTodo= await Todo.findById(req.params.id);
         res.json(newTodo);
@@ -23,7 +24,7 @@ router.get("/myTodo/:id", async (req,res)=>{
 });
 
 
-router.post("/create", async (req,res)=>{
+router.post("/create",authenticateAccessToken, async (req,res)=>{
     try{
 
         const {Titel,Content,Completed}=req.body;
@@ -37,7 +38,7 @@ router.post("/create", async (req,res)=>{
 });
 
 
-router.put("/myput/:id",async (req,res)=>{
+router.put("/myput/:id",authenticateAccessToken,async (req,res)=>{
 
 
     try {
@@ -57,7 +58,7 @@ router.put("/myput/:id",async (req,res)=>{
 });
 
 
-router.delete("/mydelete/:id", async (req,res)=>{
+router.delete("/mydelete/:id",authenticateAccessToken, async (req,res)=>{
     try {
         const todo = Todo.findByIdAndDelete(req.params.id);
 
@@ -72,7 +73,7 @@ router.delete("/mydelete/:id", async (req,res)=>{
 });
 
 
-router.get("/download", async (req, res) => {
+router.get("/download",authenticateAccessToken, async (req, res) => {
     try {
         const todosText = Todo.map(todo => `ID: ${todo.id}\nTitle: ${todo.title}\nContent: ${todo.content}\nCompleted: ${Completed}\n`).join('\n');
         const filePath = 'todoArray.txt';
@@ -92,7 +93,7 @@ router.get("/download", async (req, res) => {
     }
 });
 
-router.get("/search/:searchThem",async (req,res)=>{
+router.get("/search/:searchThem",authenticateAccessToken,async (req,res)=>{
     try{
         const searchValue=req.params.searchThem;
         const results = await Todo.find(
